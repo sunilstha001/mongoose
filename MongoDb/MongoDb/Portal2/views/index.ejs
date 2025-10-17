@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Management</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f8f9fa;
+        margin: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+      }
+
+      input,
+      select,
+      button {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      input {
+        flex: 1;
+      }
+
+      button {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #0056b3;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+      }
+
+      th {
+        background: #007bff;
+        color: white;
+      }
+
+      /* Improved Delete/Edit Buttons */
+      .btn-action {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+      }
+
+      .btn-delete {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-delete:hover {
+        background: #c0392b;
+      }
+
+      .btn-edit {
+        background: #2ecc71;
+        color: white;
+      }
+
+      .btn-edit:hover {
+        background: #27ae60;
+      }
+
+      .pagination {
+        text-align: center;
+        margin-top: 15px;
+      }
+
+      .pagination button {
+        margin: 0 5px;
+        padding: 8px 15px;
+      }
+      .pagination a {
+        text-decoration: none;
+        background: #f4f4f4;
+        color: black;
+      }
+
+      .pagination a.active {
+        background: #007bff; /* Blue background for current page */
+        color: white;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Student Management</h1>
+
+      <!-- Add Student Form -->
+      <form action="/addStudent" method="POST">
+        <input type="text" name="name" placeholder="Name" required />
+        <input type="text" name="section" placeholder="Section" required />
+        <input type="number" name="marks" placeholder="Marks" required />
+        <button type="submit">Add Student</button>
+      </form>
+
+      <!-- Filter Form -->
+      <form action="/filter" method="GET">
+        <select name="condition">
+          <option value="greater">Greater Than</option>
+          <option value="less">Less Than</option>
+        </select>
+        <input type="number" name="marks" placeholder="Marks" />
+        <button type="submit">Filter</button>
+      </form>
+
+      <!-- Student Table -->
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Section</th>
+            <th>Marks</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (data.length === 0) { %>
+          <tr>
+            <td
+              colspan="4"
+              style="text-align: center; color: red; font-weight: bold"
+            >
+               No students found!
+            </td>
+          </tr>
+          <% } else { %> <% data.forEach((val) => { %>
+          <tr>
+            <td><%= val.name %></td>
+            <td><%= val.section %></td>
+            <td><%= val.marks %></td>
+            <td>
+              <div style="display: flex; justify-content: center; gap: 8px">
+                <form action="/deleteStudent/<%=val.id%>" method="POST">
+                  <button type="submit" class="btn-action btn-delete">
+                    Delete
+                  </button>
+                </form>
+                <form action="/editStudent/<%=val.id%>" method="get">
+                  <button type="submit" class="btn-action btn-edit">
+                    Edit
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+           <% } %>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <!-- Prev Button -->
+        <% if (currentPage > 1) { %>
+        <a href="/?page=<%= currentPage - 1 %>&limit"><button>Prev</button></a>
+        <% } else { %>
+        <button disabled>Prev</button>
+        <% } %>
+
+        <!-- Page Numbers -->
+        <% for (let i = 1; i <= totalPages; i++) { %>
+        <a
+          href="/?page=<%= i %>&limit"
+          class="<%= i === currentPage ? 'active' : '' %>"
+          ><%= i %></a
+        >
+        <% } %>
+
+        <!-- Next Button -->
+        <% if (currentPage < totalPages) { %>
+        <a href="/?page=<%= currentPage + 1 %>&limit"><button>Next</button></a>
+        <% } else { %>
+        <button disabled>Next</button>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>
